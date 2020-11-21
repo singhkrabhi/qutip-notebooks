@@ -1,4 +1,4 @@
-Qutip notebooks
+QuTiP notebooks
 ===============
 
 These files are [IPython notebooks](http://ipython.org/notebook.html) for
@@ -21,7 +21,7 @@ or, if you have an old version of IPython installed
 This will open a new page in your web browser, showing the IPython notebook
 dashboard page with an index of all the notebooks.
 
-Older notebooks are in v3 format. Some of the newer notebooks are in v4 format.
+Older notebooks are in v3 format. The newer notebooks are in v4 format.
 If you are using a version of IPython notebook that does not support v4 format.
 (which would be v3.0.0 or lower), then you can convert these notebooks using:
 
@@ -29,11 +29,30 @@ If you are using a version of IPython notebook that does not support v4 format.
     
 # Interactive online versions
 
-This is a currently (Feb 2016) running in a beta host service binder,
-which seems to running well.
-[![Binder](http://img.shields.io/badge/launch-binder-ff69b4.svg?style=flat)](http://mybinder.org/repo/qutip/qutip-notebooks)
+This is currently (Jul 2019) running on the host service provided by My Binder.
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/qutip/qutip-notebooks/master?filepath=index.ipynb)
     
 # Online read-only versions
 
 You can also view the notebooks online, as read-only HTML pages rendered by
-http://nbviewer.ipython.org
+http://nbviewer.ipython.org. The notebooks are rendered also by My Binder. [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/qutip/qutip-notebooks/master?filepath=index.ipynb).
+
+# Tutorials and lectures
+
+The notebooks are organized with tutorials and lectures on [index.ipynb](index.ipynb).
+
+# Contribute
+
+You are most welcome to contribute to the QuTiP notebooks  by forking this
+repository and sending pull requests, or filing bug reports at the
+[issues page](http://github.com/qutip/qutip-notebooks/issues), or send us bug reports,
+questions, or your proposed changes to our
+[QuTiP discussion group](http://groups.google.com/group/qutip).
+
+All contributions are acknowledged in the
+[contributors](http://github.com/qutip/qutip-doc/blob/master/contributors.rst)
+section in the documentation.
+
+Note that all notebook contributions must have a ```qutip.about()``` line at the end for reproducibility purposes. It is also encouraged to add the notebook to the [tutorial page](http://qutip.org/tutorials.html) and the [index](index.ipynb).
+
+For more information, including technical advice, please see [Contributing to QuTiP development](https://github.com/qutip/qutip-doc/blob/master/qutip_dev_contrib.md).
