@@ -1,0 +1,89 @@
+from scipy.integrate import solve_ivp
+from scipy import linalg as lg
+import matplotlib.pyplot as plt
+import math
+import cmath
+import numpy as np
+from qutip import *
+import scipy.interpolate
+import scipy.linalg as la
+from mpl_toolkits.axes_grid.inset_locator import (inset_axes, InsetPosition,mark_inset)
+
+omg0 = 1.0
+wa  = 1.25   # frequency of system a
+wb  = 1.25   # frequency of system a
+wab = 0.2   # coupling frequency
+ga = 0.05     # dissipation rate of system a
+gb = 0.05  # dissipation rate of system b
+Na = 7            # number of states in system a
+Nb = 7            # number of states in system b 
+E= 1 
+E1= 1 
+g = 1
+J1 = 0.5 
+J2 = 0.5
+J3 = 0.5
+alpha = np.pi/3
+a = tensor(destroy(Na), qeye(Nb),qeye(2),qeye(2),qeye(2),qeye(2))
+b = tensor(qeye(Na), destroy(Nb),qeye(2),qeye(2),qeye(2),qeye(2))
+na = a.dag() * a
+nb = b.dag() * b
+
+sigx1 = tensor(sigmax(), qeye(2),qeye(2),qeye(2), identity(Na), identity(Nb))
+sigx2 = tensor(qeye(2), sigmax(),qeye(2),qeye(2), identity(Na), identity(Nb))
+sigx3 = tensor(qeye(2), qeye(2),sigmax(),qeye(2), identity(Na), identity(Nb))
+sigx4 = tensor(qeye(2), qeye(2),qeye(2),sigmax(), identity(Na), identity(Nb))
+#sm1 = tensor(sigmam(), qeye(2),qeye(2))
+#sm2 = tensor(qeye(2), sigmam(),qeye(2))
+#sm3 = tensor(qeye(2),qeye(2), sigmam())
+
+sigy1 = tensor(sigmay(), qeye(2), qeye(2),qeye(2), identity(Na), identity(Nb))
+sigy2 = tensor(qeye(2), sigmay(), qeye(2),qeye(2), identity(Na), identity(Nb))
+sigy3 = tensor(qeye(2), qeye(2), sigmay(),qeye(2), identity(Na), identity(Nb))
+sigy4 = tensor(qeye(2), qeye(2),qeye(2), sigmay(), identity(Na), identity(Nb))
+
+sigz1 = tensor(sigmaz(), qeye(2), qeye(2),qeye(2), identity(Na), identity(Nb))
+sigz2 = tensor(qeye(2), sigmaz(), qeye(2),qeye(2), identity(Na), identity(Nb))
+sigz3 = tensor(qeye(2), qeye(2), sigmaz(),qeye(2), identity(Na), identity(Nb))
+sigz4 = tensor(qeye(2), qeye(2),qeye(2), sigmaz(), identity(Na), identity(Nb))
+
+#correlator=sigx1*sigx2+sigy1*sigy2+sigz1*sigz2
+I1 = tensor(qeye(2), qeye(2), qeye(2),qeye(2), identity(Na), identity(Nb))
+Sz1 = 0.5 * (np.cos(alpha)*sigmaz()+np.sin(alpha)* sigmax());
+Sz2 = 0.5 * (np.cos(alpha)*sigmaz()+np.sin(alpha)* sigmax());
+#------basis 0f x-----------
+Sx1 = 0.5 * (np.cos(alpha)*(sigmap()-sigmam())-np.sin(alpha)* sigmaz());
+Sx2 = 0.5 * (np.cos(alpha)*(sigmap()-sigmam())-np.sin(alpha)* sigmaz());
+
+
+H0 = 0.5 * omg0 * (sigz1 + sigz2 + sigz3 + sigz4) 
+H1 = g * tensor(Sx1, qeye(2), qeye(2),qeye(2), identity(Na), identity(Nb)) 
+H2 = g * tensor(qeye(2), qeye(2),qeye(2),Sx2, identity(Na), identity(Nb))
+H3 = J1 * tensor(Sz1, Sz2, qeye(2),qeye(2), identity(Na), identity(Nb))
+H4 = J2 * tensor(qeye(2), Sz1, Sz2,qeye(2), identity(Na), identity(Nb))
+H5 = J3 * tensor(qeye(2),qeye(2), Sz1, Sz2, identity(Na), identity(Nb))
+
+H = wa*na+wb*nb+wab*(a.dag()*b+a*b.dag())+E*(b+b.dag())*H2+E1*(a+a.dag())*H1+ H0 + H3+ H4+ H5
+
+# start with both oscillators in ground state
+psi1 = tensor(basis(Na), basis(Nb))
+psi2=1/np.sqrt(2)*(tensor(basis(2,0), basis(2,0))+tensor(basis(2,1), basis(2,1)))
+psi0=tensor(psi1,psi2,psi2)
+#construct collapse operators
+c_op_list = []
+c_op_list.append(np.sqrt(ga) * a)
+c_op_list.append(np.sqrt(gb) * b)
+
+tlist = np.linspace(0, 50, 801)
+
+#run simulation
+#data1 = mesolve(H,psi0,tlist,c_op_list,[na,nb])
+##------------
+opts = Options(atol=1.0e-8, rtol=1.0e-6, method='adams', order=12, nsteps=10000, first_step=0.01,max_step=0,min_step=0,
+average_expect=True,average_states=False,tidy=True, num_cpus=0, norm_tol=0.001, norm_t_tol=1e-06, norm_steps=5,
+rhs_reuse=False, rhs_filename=None, ntraj=500, gui=False, rhs_with_state=False,store_final_state=False,
+store_states=False,steady_state_average=False,seeds=None, normalize_output=True, use_openmp=None, openmp_threads=None)
+##------------
+#data1 = mesolve(H,psi0,tlist,None,[na,nb])
+
+p_ex_ref = mesolve(H, psi0, tlist, c_ops=None, e_ops=[na,nb,sigz1,sigz2,sigz3,sigz4,sigy1,sigy2,sigy3,sigy4,sigx1,sigx2,sigx3],options=opts, progress_bar=(True))
